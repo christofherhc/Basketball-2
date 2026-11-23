@@ -1,0 +1,42 @@
+<?php
+
+/**
+ * Clase Controller - Clase base para todos los controladores
+ *
+ * Proporciona funcionalidad común para renderizar vistas
+ * y gestión de autenticación básica.
+ */
+class Controller {
+    /**
+     * Renderiza una vista dentro del layout principal
+     *
+     * @param string $vista Ruta de la vista (ej. 'equipos/index')
+     * @param array $datos Datos a pasar a la vista
+     * @return void
+     */
+    protected function view(string $vista, array $datos = []): void {
+        // Extraer datos para convertir claves en variables
+        if (!empty($datos)) {
+            extract($datos, EXTR_SKIP);
+        }
+
+        // Cargar layout principal (contiene header, nav, footer).
+        // require y no require_once: cada llamada a view() debe renderizar.
+        // Con require_once, una segunda llamada en la misma petición no
+        // mostraría nada en absoluto.
+        require __DIR__ . '/../views/layouts/main.php';
+    }
+
+    /**
+     * Requiere que el usuario esté autenticado
+     * Redirige a login si no está logueado
+     *
+     * @return void
+     */
+    protected function requiereLogin(): void {
+        if (!isset($_SESSION['usuario_id'])) {
+            flashError('Debes iniciar sesión para acceder a esta página');
+            redir('controller=Auth&action=index');
+        }
+    }
+}
